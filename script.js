@@ -1,13 +1,23 @@
 const keys = document.querySelectorAll(".key");
+const audioMap = {};
+
+keys.forEach((key) => {
+  let rawNote = key.dataset.note;
+  if (!rawNote) return; // note가 없으면 건너뜀
+
+  let note = rawNote.replace("#", "s");
+  const audio = new Audio(`${note}.wav`);
+  audioMap[note] = audio;
+});
 
 keys.forEach((key) => {
   key.addEventListener("click", () => {
-    let note = key.dataset.note;
+    let rawNote = key.dataset.note;
+    if (!rawNote) return;
 
-    // 샵 표기 변경: # → s
-    note = note.replace("#", "s");
+    let note = rawNote.replace("#", "s");
 
-    const audio = new Audio(`${note}.wav`);
-    audio.play();
+    const sound = audioMap[note]?.cloneNode();
+    if (sound) sound.play();
   });
 });
