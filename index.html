@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <title>웹 피아노</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <h1>Lake Piano</h1>
+    <div class="piano">
+      <!-- A0~B0 -->
+      <div class="octave">
+        <div class="key white invisible"></div>
+        <div class="key white invisible"></div>
+        <div class="key white invisible"></div>
+        <div class="key white invisible"></div>
+        <div class="key white invisible"></div>
+        <div class="key white" data-note="A0"></div>
+        <div class="key black" style="left: 355px" data-note="A#0"></div>
+        <div class="key white" data-note="B0"></div>
+      </div>
+
+      <!-- C1~B7 -->
+      <!-- 각 옥타브 반복 -->
+      <!-- 레이블은 C음에만 표시 -->
+      <!-- 모든 옥타브 수동 작성 -->
+
+      <!-- 옥타브 1 -->
+      <div class="octave">
+        <div class="key white" data-note="C1">
+          <span class="note-label">C1</span>
+        </div>
+        <div class="key black" style="left: 37px" data-note="C#1"></div>
+        <div class="key white" data-note="D1"></div>
+        <div class="key black" style="left: 108px" data-note="D#1"></div>
+        <div class="key white" data-note="E1"></div>
+        <div class="key white" data-note="F1"></div>
+        <div class="key black" style="left: 220px" data-note="F#1"></div>
+        <div class="key white" data-note="G1"></div>
+        <div class="key black" style="left: 287px" data-note="G#1"></div>
+        <div class="key white" data-note="A1"></div>
+        <div class="key black" style="left: 355px" data-note="A#1"></div>
+        <div class="key white" data-note="B1"></div>
+      </div>
+
+      <!-- 옥타브 2 -->
+      <div class="octave">
+        <div class="key white" data-note="C2">
+          <span class="note-label">C2</span>
+        </div>
+        <div class="key black" style="left: 37px" data-note="C#2"></div>
+        <div class="key white" data-note="D2"></div>
+        <div class="key black" style="left: 108px" data-note="D#2"></div>
+        <div class="key white" data-note="E2"></div>
+        <div class="key white" data-note="F2"></div>
+        <div class="key black" style="left: 220px" data-note="F#2"></div>
+        <div class="key white" data-note="G2"></div>
+        <div class="key black" style="left: 287px" data-note="G#2"></div>
+        <div class="key white" data-note="A2"></div>
+        <div class="key black" style="left: 355px" data-note="A#2"></div>
+        <div class="key white" data-note="B2"></div>
+      </div>
+
+      <!-- 옥타브 3 -->
+      <div class="octave">
+        <div class="key white" data-note="C3">
+          <span class="note-label">C3</span>
+        </div>
+        <div class="key black" style="left: 37px" data-note="C#3"></div>
+        <div class="key white" data-note="D3"></div>
+        <div class="key black" style="left: 108px" data-note="D#3"></div>
+        <div class="key white" data-note="E3"></div>
+        <div class="key white" data-note="F3"></div>
+        <div class="key black" style="left: 220px" data-note="F#3"></div>
+        <div class="key white" data-note="G3"></div>
+        <div class="key black" style="left: 287px" data-note="G#3"></div>
+        <div class="key white" data-note="A3"></div>
+        <div class="key black" style="left: 355px" data-note="A#3"></div>
+        <div class="key white" data-note="B3"></div>
+      </div>
+
+      <!-- 옥타브 4 -->
+      <div class="octave">
+        <div class="key white" data-note="C4">
+          <span class="note-label">C4</span>
+        </div>
+        <div class="key black" style="left: 37px" data-note="C#4"></div>
+        <div class="key white" data-note="D4"></div>
+        <div class="key black" style="left: 108px" data-note="D#4"></div>
+        <div class="key white" data-note="E4"></div>
+        <div class="key white" data-note="F4"></div>
+        <div class="key black" style="left: 220px" data-note="F#4"></div>
+        <div class="key white" data-note="G4"></div>
+        <div class="key black" style="left: 287px" data-note="G#4"></div>
+        <div class="key white" data-note="A4"></div>
+        <div class="key black" style="left: 355px" data-note="A#4"></div>
+        <div class="key white" data-note="B4"></div>
+      </div>
+
+      <!-- 옥타브 5 -->
+      <div class="octave">
+        <div class="key white" data-note="C5">
+          <span class="note-label">C5</span>
+        </div>
+        <div class="key black" style="left: 37px" data-note="C#5"></div>
+        <div class="key white" data-note="D5"></div>
+        <div class="key black" style="left: 108px" data-note="D#5"></div>
+        <div class="key white" data-note="E5"></div>
+        <div class="key white" data-note="F5"></div>
+        <div class="key black" style="left: 220px" data-note="F#5"></div>
+        <div class="key white" data-note="G5"></div>
+        <div class="key black" style="left: 287px" data-note="G#5"></div>
+        <div class="key white" data-note="A5"></div>
+        <div class="key black" style="left: 355px" data-note="A#5"></div>
+        <div class="key white" data-note="B5"></div>
+      </div>
+
+      <!-- 옥타브 6 -->
+      <div class="octave">
+        <div class="key white" data-note="C6">
+          <span class="note-label">C6</span>
+        </div>
+        <div class="key black" style="left: 37px" data-note="C#6"></div>
+        <div class="key white" data-note="D6"></div>
+        <div class="key black" style="left: 108px" data-note="D#6"></div>
+        <div class="key white" data-note="E6"></div>
+        <div class="key white" data-note="F6"></div>
+        <div class="key black" style="left: 220px" data-note="F#6"></div>
+        <div class="key white" data-note="G6"></div>
+        <div class="key black" style="left: 287px" data-note="G#6"></div>
+        <div class="key white" data-note="A6"></div>
+        <div class="key black" style="left: 355px" data-note="A#6"></div>
+        <div class="key white" data-note="B6"></div>
+      </div>
+
+      <!-- 옥타브 7 -->
+      <div class="octave">
+        <div class="key white" data-note="C7">
+          <span class="note-label">C7</span>
+        </div>
+        <div class="key black" style="left: 37px" data-note="C#7"></div>
+        <div class="key white" data-note="D7"></div>
+        <div class="key black" style="left: 108px" data-note="D#7"></div>
+        <div class="key white" data-note="E7"></div>
+        <div class="key white" data-note="F7"></div>
+        <div class="key black" style="left: 220px" data-note="F#7"></div>
+        <div class="key white" data-note="G7"></div>
+        <div class="key black" style="left: 287px" data-note="G#7"></div>
+        <div class="key white" data-note="A7"></div>
+        <div class="key black" style="left: 355px" data-note="A#7"></div>
+        <div class="key white" data-note="B7"></div>
+      </div>
+
+      <!-- 마지막 C8 -->
+      <div class="octave">
+        <div class="key white" data-note="C8">
+          <span class="note-label">C8</span>
+        </div>
+      </div>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>
