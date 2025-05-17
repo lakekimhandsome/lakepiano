@@ -2,6 +2,10 @@ body {
   text-align: center;
   font-family: Arial, sans-serif;
   background: #f0f0f0;
+  touch-action: manipulation; /* double-tap 확대 방지 */
+  -webkit-user-select: none; /* 텍스트 선택도 방지 */
+  user-select: none;
+  -webkit-tap-highlight-color: transparent; /* 탭시 파란 효과 제거 */
 }
 
 .piano {
@@ -23,6 +27,10 @@ body {
   border: 1px solid #333;
   cursor: pointer;
   position: relative;
+  touch-action: manipulation; /* double-tap 확대 방지 */
+  -webkit-user-select: none; /* 텍스트 선택도 방지 */
+  user-select: none;
+  -webkit-tap-highlight-color: transparent; /* 탭시 파란 효과 제거 */
 }
 
 .white {
