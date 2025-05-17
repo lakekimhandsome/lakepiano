@@ -7,7 +7,7 @@ keys.forEach((key) => {
     // 샵 표기 변경: # → s
     note = note.replace("#", "s");
 
-    const audio = new Audio(`sounds/${note}.wav`);
+    const audio = new Audio(`${note}.wav`);
     audio.play();
   });
 });
