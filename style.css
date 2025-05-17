@@ -6,6 +6,14 @@ body {
   -webkit-user-select: none; /* 텍스트 선택도 방지 */
   user-select: none;
   -webkit-tap-highlight-color: transparent; /* 탭시 파란 효과 제거 */
+  width: 100vw; /* 뷰포트 너비에 딱 맞춤 */
+  overflow-x: hidden; /* 넘치는 거 잘라냄 */
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
 }
 
 .piano {
