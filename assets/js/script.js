@@ -93,7 +93,7 @@ const notes = [
 
 // 모든 mp3 파일을 메모리에 로딩합니다.
 notes.forEach((note) => {
-  fetch(`${note}.mp3`)
+  fetch(`assets/audio/mp3/${note}.mp3`)
     .then((res) => {
       if (!res.ok) throw new Error(`음원 로딩 실패: ${note}`);
       return res.arrayBuffer();

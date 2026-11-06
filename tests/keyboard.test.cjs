@@ -34,9 +34,12 @@ function setup() {
   const context = vm.createContext({
     window: { AudioContext, addEventListener: (type, handler) => { windowEvents[type] = handler; } },
     document, console,
-    fetch: () => new Promise(() => {}),
+    fetch: (url) => {
+      assert.ok(fs.existsSync(path.join(__dirname, '..', url)), `Missing sample: ${url}`);
+      return new Promise(() => {});
+    },
   });
-  vm.runInContext(fs.readFileSync(path.join(__dirname, '../script.js'), 'utf8'), context);
+  vm.runInContext(fs.readFileSync(path.join(__dirname, '../assets/js/script.js'), 'utf8'), context);
   vm.runInContext('notes.forEach(note => bufferMap[note] = note)', context);
   const down = (code, options = {}) => {
     const event = { code, target: { closest: () => false }, preventDefault() { this.prevented = true; }, ...options };
@@ -58,7 +61,7 @@ test('all 48 physical keys play C3–B6 and release; every sample exists', () =>
   const app = setup();
   rows.forEach((row, index) => row.forEach((code, step) => {
     const note = `${notes[step]}${index + 3}`;
-    assert.ok(fs.existsSync(path.join(__dirname, '..', `${note}.mp3`)));
+    assert.ok(fs.existsSync(path.join(__dirname, '../assets/audio/mp3', `${note}.mp3`)));
     assert.equal(app.down(code, { key: '한', shiftKey: true }).prevented, true);
     const source = app.sources.at(-1);
     assert.equal(source.buffer, note);
