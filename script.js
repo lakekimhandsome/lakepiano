@@ -91,24 +91,79 @@ const notes = [
   "C8",
 ];
 
-// 1. 모든 mp3 파일 비동기 로딩 → AudioBuffer 저장
+// 모든 mp3 파일을 메모리에 로딩합니다.
 notes.forEach((note) => {
   fetch(`${note}.mp3`)
-    .then((res) => res.arrayBuffer())
+    .then((res) => {
+      if (!res.ok) throw new Error(`음원 로딩 실패: ${note}`);
+      return res.arrayBuffer();
+    })
     .then((data) => audioContext.decodeAudioData(data))
-    .then((buffer) => (bufferMap[note] = buffer));
+    .then((buffer) => (bufferMap[note] = buffer))
+    .catch(console.error);
 });
 
-// 2. 키 클릭 시 즉시 메모리에서 재생
-document.querySelectorAll(".key").forEach((key) => {
-  key.addEventListener("click", () => {
-    let note = key.dataset.note.replace("#", "s");
-    const buffer = bufferMap[note];
-    if (buffer) {
-      const source = audioContext.createBufferSource();
-      source.buffer = buffer;
-      source.connect(audioContext.destination);
-      source.start();
-    }
-  });
+function playNote(note) {
+  if (audioContext.state === "suspended") audioContext.resume().catch(console.error);
+  const buffer = bufferMap[note.replace("#", "s")];
+  if (!buffer) return;
+  const source = audioContext.createBufferSource();
+  const gain = audioContext.createGain();
+  source.buffer = buffer;
+  source.connect(gain);
+  gain.connect(audioContext.destination);
+  source.onended = () => {
+    source.disconnect();
+    gain.disconnect();
+  };
+  source.start();
+  return { source, gain };
+}
+
+const pianoKeys = new Map();
+document.querySelectorAll(".key[data-note]").forEach((key) => {
+  pianoKeys.set(key.dataset.note, key);
+  key.addEventListener("click", () => playNote(key.dataset.note));
+});
+
+// 물리 키 위치를 사용해 한/영 입력과 Shift 상태에 관계없이 연주합니다.
+const keyboardRows = [
+  ["Backquote", "Digit1", "Digit2", "Digit3", "Digit4", "Digit5", "Digit6", "Digit7", "Digit8", "Digit9", "Digit0", "Minus"],
+  ["Tab", "KeyQ", "KeyW", "KeyE", "KeyR", "KeyT", "KeyY", "KeyU", "KeyI", "KeyO", "KeyP", "BracketLeft"],
+  ["KeyA", "KeyS", "KeyD", "KeyF", "KeyG", "KeyH", "KeyJ", "KeyK", "KeyL", "Semicolon", "Quote", "Enter"],
+  ["ShiftLeft", "KeyZ", "KeyX", "KeyC", "KeyV", "KeyB", "KeyN", "KeyM", "Comma", "Period", "Slash", "ShiftRight"],
+];
+const semitones = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
+const keyboardNotes = new Map();
+keyboardRows.forEach((row, index) => {
+  row.forEach((code, step) => keyboardNotes.set(code, `${semitones[step]}${index + 3}`));
+});
+const pressedKeys = new Map();
+
+document.addEventListener("keydown", (event) => {
+  const note = keyboardNotes.get(event.code);
+  if (!note || event.ctrlKey || event.metaKey || event.altKey ||
+      event.target.closest("input, textarea, select, button, a, [contenteditable]:not([contenteditable='false'])")) return;
+  event.preventDefault();
+  if (event.repeat || pressedKeys.has(event.code)) return;
+  const voice = playNote(note);
+  if (!voice) return;
+  pressedKeys.set(event.code, { ...voice, note });
+  pianoKeys.get(note).classList.add("active");
+});
+
+function releaseKey(code) {
+  const voice = pressedKeys.get(code);
+  if (!voice) return;
+  const time = audioContext.currentTime;
+  voice.gain.gain.setTargetAtTime(0, time, 0.01);
+  voice.source.stop(time + 0.05);
+  pianoKeys.get(voice.note).classList.remove("active");
+  pressedKeys.delete(code);
+}
+
+document.addEventListener("keyup", (event) => releaseKey(event.code));
+window.addEventListener("blur", () => pressedKeys.forEach((_, code) => releaseKey(code)));
+document.addEventListener("visibilitychange", () => {
+  if (document.hidden) pressedKeys.forEach((_, code) => releaseKey(code));
 });

@@ -70,3 +70,11 @@ body {
 .invisible {
   visibility: hidden;
 }
+
+.white.active {
+  background: #b9d9ff;
+}
+
+.black.active {
+  background: #316aab;
+}
