@@ -72,6 +72,8 @@ body {
 }
 
 .piano {
+  --white-key-width: 60px;
+  --black-key-offset: 5px;
   display: flex;
   flex-direction: column;
   gap: 20px;
@@ -97,7 +99,7 @@ body {
 }
 
 .white {
-  width: 60px;
+  flex: 0 0 var(--white-key-width);
   height: 200px;
   background: white;
   z-index: 1;
@@ -109,7 +111,28 @@ body {
   background: black;
   position: absolute;
   top: 0;
+  transform: translateX(-50%);
   z-index: 2;
+}
+
+.black[data-note^="C#"] {
+  left: calc(var(--white-key-width) - var(--black-key-offset));
+}
+
+.black[data-note^="D#"] {
+  left: calc(2 * var(--white-key-width) + var(--black-key-offset));
+}
+
+.black[data-note^="F#"] {
+  left: calc(4 * var(--white-key-width) - var(--black-key-offset));
+}
+
+.black[data-note^="G#"] {
+  left: calc(5 * var(--white-key-width));
+}
+
+.black[data-note^="A#"] {
+  left: calc(6 * var(--white-key-width) + var(--black-key-offset));
 }
 
 .note-label {
