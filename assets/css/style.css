@@ -85,7 +85,7 @@ body {
   display: flex;
   width: max-content;
   position: relative;
-  height: 200px;
+  height: calc(var(--white-key-width) * 150 / 23);
 }
 
 .piano > .octave:first-child {
@@ -109,14 +109,13 @@ body {
 .white {
   flex: none;
   width: var(--white-key-width);
-  height: 200px;
   background: white;
   z-index: 1;
 }
 
 .black {
   width: calc(var(--white-key-width) * 0.48);
-  height: 120px;
+  height: calc(var(--white-key-width) * 95 / 23);
   background: black;
   position: absolute;
   top: 0;
