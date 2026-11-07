@@ -154,11 +154,13 @@ function updateKeyboardMode() {
   whiteKeysGuide.hidden = !whiteKeysOnly.checked;
 }
 
-whiteKeysOnly.addEventListener("change", updateKeyboardMode);
-updateKeyboardMode();
+if (whiteKeysOnly) {
+  whiteKeysOnly.addEventListener("change", updateKeyboardMode);
+  updateKeyboardMode();
+}
 
 document.addEventListener("keydown", (event) => {
-  const mapping = whiteKeysOnly.checked ? whiteKeyNotes : keyboardNotes;
+  const mapping = whiteKeysOnly?.checked ? whiteKeyNotes : keyboardNotes;
   const note = mapping.get(event.code);
   const switchFocused = event.target === whiteKeysOnly;
   if (!note || event.ctrlKey || event.metaKey || event.altKey ||
