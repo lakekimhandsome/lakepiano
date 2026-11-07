@@ -135,15 +135,35 @@ const keyboardRows = [
 ];
 const semitones = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
 const keyboardNotes = new Map();
+const whiteKeyNotes = new Map();
+const whiteKeysOnly = document.getElementById("white-keys-only");
+const chromaticGuide = document.getElementById("chromatic-guide");
+const whiteKeysGuide = document.getElementById("white-keys-guide");
+const whiteNotes = semitones.filter((note) => !note.includes("#"));
 keyboardRows.forEach((row, index) => {
-  row.forEach((code, step) => keyboardNotes.set(code, `${semitones[step]}${index + 3}`));
+  const octave = index + 3;
+  row.forEach((code, step) => keyboardNotes.set(code, `${semitones[step]}${octave}`));
+  const firstWhiteKey = index === 2 ? 0 : 1;
+  whiteNotes.forEach((note, step) => whiteKeyNotes.set(row[firstWhiteKey + step], `${note}${octave}`));
 });
 const pressedKeys = new Map();
 
+function updateKeyboardMode() {
+  pressedKeys.forEach((_, code) => releaseKey(code));
+  chromaticGuide.hidden = whiteKeysOnly.checked;
+  whiteKeysGuide.hidden = !whiteKeysOnly.checked;
+}
+
+whiteKeysOnly.addEventListener("change", updateKeyboardMode);
+updateKeyboardMode();
+
 document.addEventListener("keydown", (event) => {
-  const note = keyboardNotes.get(event.code);
+  const mapping = whiteKeysOnly.checked ? whiteKeyNotes : keyboardNotes;
+  const note = mapping.get(event.code);
+  const switchFocused = event.target === whiteKeysOnly;
   if (!note || event.ctrlKey || event.metaKey || event.altKey ||
-      event.target.closest("input, textarea, select, button, a, [contenteditable]:not([contenteditable='false'])")) return;
+      (event.code === "Tab" && (switchFocused || event.shiftKey)) ||
+      (!switchFocused && event.target.closest("input, textarea, select, button, a, [contenteditable]:not([contenteditable='false'])"))) return;
   event.preventDefault();
   if (event.repeat || pressedKeys.has(event.code)) return;
   const voice = playNote(note);

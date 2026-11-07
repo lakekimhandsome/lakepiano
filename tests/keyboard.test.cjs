@@ -15,6 +15,14 @@ function setup() {
     addEventListener(type, handler) { this[type] = handler; },
   }));
   keys.forEach((key) => { key.classList.remove = key.classList.delete; });
+  const elements = {
+    'white-keys-only': {
+      checked: false,
+      addEventListener(type, handler) { this[type] = handler; },
+    },
+    'chromatic-guide': {},
+    'white-keys-guide': {},
+  };
   class AudioContext {
     state = 'suspended';
     currentTime = 0;
@@ -28,6 +36,7 @@ function setup() {
   }
   const document = {
     hidden: false,
+    getElementById: (id) => elements[id],
     querySelectorAll: () => keys,
     addEventListener: (type, handler) => { documentEvents[type] = handler; },
   };
@@ -46,7 +55,7 @@ function setup() {
     documentEvents.keydown(event);
     return event;
   };
-  return { context, down, keys, sources, document, documentEvents, windowEvents };
+  return { context, down, elements, keys, sources, document, documentEvents, windowEvents };
 }
 
 const rows = [
@@ -62,7 +71,7 @@ test('all 48 physical keys play C3–B6 and release; every sample exists', () =>
   rows.forEach((row, index) => row.forEach((code, step) => {
     const note = `${notes[step]}${index + 3}`;
     assert.ok(fs.existsSync(path.join(__dirname, '../assets/audio/mp3', `${note}.mp3`)));
-    assert.equal(app.down(code, { key: '한', shiftKey: true }).prevented, true);
+    assert.equal(app.down(code, { key: '한', shiftKey: code !== 'Tab' }).prevented, true);
     const source = app.sources.at(-1);
     assert.equal(source.buffer, note);
     assert.equal(source.started, true);
@@ -88,6 +97,53 @@ test('chords, repeat suppression, and focus loss cleanup', () => {
   app.document.hidden = true;
   app.documentEvents.visibilitychange();
   assert.equal(app.sources.at(-1).stopped, true);
+});
+
+test('the switch maps exactly 28 keys to white notes and releases held notes on a change', () => {
+  const app = setup();
+  const toggle = app.elements['white-keys-only'];
+  const chromaticGuide = app.elements['chromatic-guide'];
+  const whiteKeysGuide = app.elements['white-keys-guide'];
+  assert.equal(chromaticGuide.hidden, false);
+  assert.equal(whiteKeysGuide.hidden, true);
+  app.down('Digit1');
+  const chromaticVoice = app.sources.at(-1);
+  assert.equal(chromaticVoice.buffer, 'Cs3');
+  toggle.checked = true;
+  toggle.change();
+  assert.equal(chromaticVoice.stopped, true);
+  assert.ok(app.keys.every(key => !key.classList.has('active')));
+  assert.equal(chromaticGuide.hidden, true);
+  assert.equal(whiteKeysGuide.hidden, false);
+  assert.equal(app.down('Digit1', { repeat: true }).prevented, true);
+  assert.equal(app.sources.length, 1);
+
+  const whiteRows = [
+    [...'1234567'].map(key => `Digit${key}`),
+    ...['QWERTYU', 'ASDFGHJ', 'ZXCVBNM'].map(row => [...row].map(key => `Key${key}`)),
+  ];
+  rows.forEach((row, octave) => row.forEach((code) => {
+    const step = whiteRows[octave].indexOf(code);
+    const event = app.down(code, { target: toggle });
+    if (step === -1) {
+      assert.equal(event.prevented, undefined, code);
+      return;
+    }
+    assert.equal(event.prevented, true, code);
+    assert.equal(app.sources.at(-1).buffer, `${'CDEFGAB'[step]}${octave + 3}`);
+    app.documentEvents.keyup({ code });
+  }));
+  assert.equal(app.sources.length, 29);
+
+  toggle.checked = false;
+  toggle.change();
+  assert.equal(chromaticGuide.hidden, false);
+  assert.equal(whiteKeysGuide.hidden, true);
+  assert.equal(app.down('Tab', { target: toggle }).prevented, undefined);
+  assert.equal(app.down('Tab', { shiftKey: true }).prevented, undefined);
+  assert.equal(app.down('Space', { target: toggle }).prevented, undefined);
+  app.down('Digit1', { target: toggle });
+  assert.equal(app.sources.at(-1).buffer, 'Cs3');
 });
 
 test('shortcuts, editable fields and unrelated keys retain default behavior', () => {

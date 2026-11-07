@@ -16,6 +16,61 @@ body {
   box-sizing: border-box;
 }
 
+.keyboard-mode {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  cursor: pointer;
+}
+
+.keyboard-mode input {
+  appearance: none;
+  display: grid;
+  align-items: center;
+  width: 40px;
+  height: 24px;
+  margin: 0;
+  padding: 2px;
+  border: 1px solid #626262;
+  border-radius: 12px;
+  background: #767676;
+  cursor: pointer;
+}
+
+.keyboard-mode input::before {
+  content: "";
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: white;
+}
+
+.keyboard-mode input:checked {
+  background: #245e9b;
+  border-color: #245e9b;
+}
+
+.keyboard-mode input:checked::before {
+  justify-self: end;
+}
+
+.keyboard-mode input:focus-visible {
+  outline: 2px solid #245e9b;
+  outline-offset: 3px;
+}
+
+@media (forced-colors: active) {
+  .keyboard-mode input {
+    appearance: auto;
+    display: revert;
+  }
+
+  .keyboard-mode input::before {
+    content: none;
+  }
+}
+
 .piano {
   display: flex;
   flex-direction: column;
