@@ -127,6 +127,7 @@ test('the switch maps exactly 28 keys to white notes and releases held notes on 
     const event = app.down(code, { target: toggle });
     if (step === -1) {
       assert.equal(event.prevented, undefined, code);
+      app.documentEvents.keyup({ code });
       return;
     }
     assert.equal(event.prevented, true, code);
@@ -151,7 +152,7 @@ test('shortcuts, editable fields and unrelated keys retain default behavior', ()
   for (const options of [{ metaKey: true }, { ctrlKey: true }, { altKey: true }, { target: { closest: () => true } }]) {
     assert.equal(app.down('KeyA', options).prevented, undefined);
   }
-  assert.equal(app.down('Space').prevented, undefined);
+  assert.equal(app.down('Escape').prevented, undefined);
   assert.equal(app.sources.length, 0);
 });
 
@@ -165,4 +166,65 @@ test('click playback and missing-buffer recovery', () => {
   vm.runInContext('bufferMap.C4 = "C4"', app.context);
   app.down('Tab');
   assert.equal(app.sources.length, 2);
+});
+
+test('Space sustains released notes, leaves held notes playing, and resets on blur', () => {
+  const app = setup();
+  const up = code => app.documentEvents.keyup({ code });
+  assert.equal(app.down('Space').prevented, true);
+  app.down('KeyA');
+  up('KeyA');
+  assert.equal(app.sources[0].stopped, undefined);
+  app.down('KeyA');
+  up('Space');
+  assert.equal(app.sources[0].stopped, true);
+  assert.equal(app.sources[1].stopped, undefined);
+  up('KeyA');
+  assert.equal(app.sources[1].stopped, true);
+
+  app.down('Space');
+  app.down('KeyA');
+  up('KeyA');
+  assert.equal(app.sources[2].stopped, undefined);
+  app.windowEvents.blur();
+  assert.equal(app.sources[2].stopped, true);
+  app.down('KeyA');
+  up('KeyA');
+  assert.equal(app.sources[3].stopped, true);
+});
+
+test('white-key mode shifts by a semitone across white keys and octave boundaries', () => {
+  const app = setup();
+  const toggle = app.elements['white-keys-only'];
+  toggle.checked = true;
+  toggle.change();
+  const up = code => app.documentEvents.keyup({ code });
+  const check = (code, sample) => {
+    app.down(code);
+    assert.equal(app.sources.at(-1).buffer, sample);
+    up(code);
+  };
+
+  app.down('ShiftLeft');
+  assert.equal(app.sources.length, 0);
+  check('Digit1', 'B2');
+  check('Digit2', 'Cs3');
+  check('Digit4', 'E3');
+  app.down('Digit1');
+  const flat = app.sources.at(-1);
+  up('ShiftLeft');
+  up('Digit1');
+  assert.equal(flat.stopped, true);
+  check('Digit1', 'C3');
+
+  app.down('ShiftRight');
+  check('Digit1', 'Cs3');
+  check('Digit3', 'F3');
+  check('KeyM', 'C7');
+  app.down('ShiftLeft');
+  check('Digit1', 'C3');
+  up('ShiftLeft');
+  check('Digit1', 'Cs3');
+  app.windowEvents.blur();
+  check('Digit1', 'C3');
 });

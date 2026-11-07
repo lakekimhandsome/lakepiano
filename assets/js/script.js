@@ -112,12 +112,15 @@ function playNote(note) {
   source.buffer = buffer;
   source.connect(gain);
   gain.connect(audioContext.destination);
+  const voice = { source, gain, note, ended: false };
   source.onended = () => {
+    voice.ended = true;
+    sustainedVoices.delete(voice);
     source.disconnect();
     gain.disconnect();
   };
   source.start();
-  return { source, gain };
+  return voice;
 }
 
 const pianoKeys = new Map();
@@ -126,7 +129,7 @@ document.querySelectorAll(".key[data-note]").forEach((key) => {
   key.addEventListener("click", () => playNote(key.dataset.note));
 });
 
-// 물리 키 위치를 사용해 한/영 입력과 Shift 상태에 관계없이 연주합니다.
+// 한/영 입력에 관계없이 물리 키 위치로 연주합니다.
 const keyboardRows = [
   ["Backquote", "Digit1", "Digit2", "Digit3", "Digit4", "Digit5", "Digit6", "Digit7", "Digit8", "Digit9", "Digit0", "Minus"],
   ["Tab", "KeyQ", "KeyW", "KeyE", "KeyR", "KeyT", "KeyY", "KeyU", "KeyI", "KeyO", "KeyP", "BracketLeft"],
@@ -147,45 +150,95 @@ keyboardRows.forEach((row, index) => {
   whiteNotes.forEach((note, step) => whiteKeyNotes.set(row[firstWhiteKey + step], `${note}${octave}`));
 });
 const pressedKeys = new Map();
+const sustainedVoices = new Set();
+const heldShifts = new Set();
+let sustainDown = false;
 
 function updateKeyboardMode() {
-  pressedKeys.forEach((_, code) => releaseKey(code));
+  resetKeyboard();
   chromaticGuide.hidden = whiteKeysOnly.checked;
   whiteKeysGuide.hidden = !whiteKeysOnly.checked;
 }
 
 if (whiteKeysOnly) {
   whiteKeysOnly.addEventListener("change", updateKeyboardMode);
+  whiteKeysOnly.addEventListener("click", (event) => {
+    if (event.detail > 0) whiteKeysOnly.blur();
+  });
   updateKeyboardMode();
 }
 
 document.addEventListener("keydown", (event) => {
-  const mapping = whiteKeysOnly?.checked ? whiteKeyNotes : keyboardNotes;
-  const note = mapping.get(event.code);
+  const { code } = event;
   const switchFocused = event.target === whiteKeysOnly;
-  if (!note || event.ctrlKey || event.metaKey || event.altKey ||
-      (event.code === "Tab" && (switchFocused || event.shiftKey)) ||
+  if (event.ctrlKey || event.metaKey || event.altKey ||
+      (code === "Tab" && (switchFocused || event.shiftKey)) ||
       (!switchFocused && event.target.closest("input, textarea, select, button, a, [contenteditable]:not([contenteditable='false'])"))) return;
+
+  if (code === "Space") {
+    if (switchFocused) return;
+    event.preventDefault();
+    if (!event.repeat) sustainDown = true;
+    return;
+  }
+
+  const whiteMode = whiteKeysOnly?.checked;
+  if (whiteMode && (code === "ShiftLeft" || code === "ShiftRight")) {
+    if (!event.repeat) heldShifts.add(code);
+    return;
+  }
+
+  let note = (whiteMode ? whiteKeyNotes : keyboardNotes).get(code);
+  if (!note) return;
   event.preventDefault();
-  if (event.repeat || pressedKeys.has(event.code)) return;
+  if (event.repeat || pressedKeys.has(code)) return;
+
+  if (whiteMode && heldShifts.size === 1) {
+    const step = heldShifts.has("ShiftLeft") ? -1 : 1;
+    note = notes[notes.indexOf(note) + step].replace("s", "#");
+  }
   const voice = playNote(note);
   if (!voice) return;
-  pressedKeys.set(event.code, { ...voice, note });
+  pressedKeys.set(code, voice);
   pianoKeys.get(note).classList.add("active");
 });
 
 function releaseKey(code) {
   const voice = pressedKeys.get(code);
   if (!voice) return;
+  pressedKeys.delete(code);
+  if (![...pressedKeys.values()].some((held) => held.note === voice.note)) {
+    pianoKeys.get(voice.note).classList.remove("active");
+  }
+  if (voice.ended) return;
+  if (sustainDown) sustainedVoices.add(voice);
+  else stopVoice(voice);
+}
+
+function stopVoice(voice) {
   const time = audioContext.currentTime;
   voice.gain.gain.setTargetAtTime(0, time, 0.01);
   voice.source.stop(time + 0.05);
-  pianoKeys.get(voice.note).classList.remove("active");
-  pressedKeys.delete(code);
 }
 
-document.addEventListener("keyup", (event) => releaseKey(event.code));
-window.addEventListener("blur", () => pressedKeys.forEach((_, code) => releaseKey(code)));
+function releaseSustain() {
+  sustainDown = false;
+  sustainedVoices.forEach(stopVoice);
+  sustainedVoices.clear();
+}
+
+function resetKeyboard() {
+  releaseSustain();
+  heldShifts.clear();
+  pressedKeys.forEach((_, code) => releaseKey(code));
+}
+
+document.addEventListener("keyup", (event) => {
+  heldShifts.delete(event.code);
+  if (event.code === "Space") releaseSustain();
+  releaseKey(event.code);
+});
+window.addEventListener("blur", resetKeyboard);
 document.addEventListener("visibilitychange", () => {
-  if (document.hidden) pressedKeys.forEach((_, code) => releaseKey(code));
+  if (document.hidden) resetKeyboard();
 });

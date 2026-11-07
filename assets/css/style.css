@@ -6,8 +6,7 @@ body {
   -webkit-user-select: none; /* 텍스트 선택도 방지 */
   user-select: none;
   -webkit-tap-highlight-color: transparent; /* 탭시 파란 효과 제거 */
-  width: 90vw; /* 뷰포트 너비에 딱 맞춤 */
-  overflow-x: hidden; /* 넘치는 거 잘라냄 */
+  margin: 8px 12px;
 }
 
 *,
@@ -72,18 +71,18 @@ body {
 }
 
 .piano {
-  --white-key-width: 60px;
+  --white-key-width: min(60px, (100vw - 24px) / 7);
   --black-key-offset: 5px;
   display: flex;
   flex-direction: column;
   gap: 20px;
-  align-items: flex-start;
+  align-items: center;
   margin: 40px auto;
-  width: fit-content;
 }
 
 .octave {
   display: flex;
+  width: max-content;
   position: relative;
   height: 200px;
 }
@@ -99,14 +98,15 @@ body {
 }
 
 .white {
-  flex: 0 0 var(--white-key-width);
+  flex: none;
+  width: var(--white-key-width);
   height: 200px;
   background: white;
   z-index: 1;
 }
 
 .black {
-  width: 40px;
+  width: calc(var(--white-key-width) * 0.48);
   height: 120px;
   background: black;
   position: absolute;
@@ -145,8 +145,8 @@ body {
   pointer-events: none;
 }
 
-.invisible {
-  visibility: hidden;
+.black[data-note="A#0"] {
+  left: calc(var(--white-key-width) + var(--black-key-offset));
 }
 
 .white.active {

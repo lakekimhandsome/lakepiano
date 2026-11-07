@@ -7,13 +7,13 @@
       name="viewport"
       content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
     />
-    <link rel="stylesheet" href="assets/css/style.css?v=3" />
+    <link rel="stylesheet" href="assets/css/style.css?v=4" />
   </head>
   <body>
     <h1>Lake Piano</h1>
     <label class="keyboard-mode">
       <input type="checkbox" role="switch" id="white-keys-only" />
-      키보드로 흰 건반만 연주
+      온음 모드 (흰건반 배열)
     </label>
     <div id="chromatic-guide">
       <p>각 줄은 C · C♯ · D · D♯ · E · F · F♯ · G · G♯ · A · A♯ · B 순서입니다.</p>
@@ -23,20 +23,17 @@
         6옥타브: 왼쪽 Shift Z X C V B N M , . / 오른쪽 Shift</p>
     </div>
     <div id="white-keys-guide" hidden>
-      <p>각 줄은 도 · 레 · 미 · 파 · 솔 · 라 · 시 순서입니다.</p>
+      <p>각 줄은 도 · 레 · 미 · 파 · 솔 · 라 · 시 순서입니다.<br />
+        왼쪽 Shift를 누르면 반음 내림, 오른쪽 Shift를 누르면 반음 올림.</p>
       <p>3옥타브: 1 2 3 4 5 6 7<br />
         4옥타브: Q W E R T Y U<br />
         5옥타브: A S D F G H J<br />
         6옥타브: Z X C V B N M</p>
     </div>
+    <p>스페이스바를 누르는 동안 서스테인 페달이 작동합니다.</p>
     <div class="piano">
       <!-- A0~B0 -->
       <div class="octave">
-        <div class="key white invisible"></div>
-        <div class="key white invisible"></div>
-        <div class="key white invisible"></div>
-        <div class="key white invisible"></div>
-        <div class="key white invisible"></div>
         <div class="key white" data-note="A0"></div>
         <div class="key black" data-note="A#0"></div>
         <div class="key white" data-note="B0"></div>
@@ -181,6 +178,6 @@
       </div>
     </div>
 
-    <script src="assets/js/script.js?v=2"></script>
+    <script src="assets/js/script.js?v=3"></script>
   </body>
 </html>
