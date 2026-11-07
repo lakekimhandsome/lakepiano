@@ -15,12 +15,24 @@ body {
   box-sizing: border-box;
 }
 
-.keyboard-mode {
+.keyboard-mode,
+.size-mode {
   display: inline-flex;
   align-items: center;
   gap: 8px;
   min-height: 44px;
   cursor: pointer;
+}
+
+.piano-controls {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  column-gap: 16px;
+}
+
+.size-mode select {
+  font: inherit;
 }
 
 .keyboard-mode input {
@@ -73,6 +85,8 @@ body {
 .piano {
   --white-key-width: min(60px, (100vw - 24px) / 7);
   --black-key-offset: 5px;
+  --white-key-length: calc(var(--white-key-width) * 150 / 23);
+  --black-key-length: calc(var(--white-key-width) * 95 / 23);
   display: flex;
   flex-direction: column;
   gap: 20px;
@@ -81,11 +95,16 @@ body {
   width: calc(7 * var(--white-key-width));
 }
 
+body:has(#piano-size option[value="simple"]:checked) .piano {
+  --white-key-length: 200px;
+  --black-key-length: 120px;
+}
+
 .octave {
   display: flex;
   width: max-content;
   position: relative;
-  height: calc(var(--white-key-width) * 150 / 23);
+  height: var(--white-key-length);
 }
 
 .piano > .octave:first-child {
@@ -115,7 +134,7 @@ body {
 
 .black {
   width: calc(var(--white-key-width) * 0.48);
-  height: calc(var(--white-key-width) * 95 / 23);
+  height: var(--black-key-length);
   background: black;
   position: absolute;
   top: 0;

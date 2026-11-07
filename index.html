@@ -7,14 +7,23 @@
       name="viewport"
       content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
     />
-    <link rel="stylesheet" href="assets/css/style.css?v=6" />
+    <link rel="stylesheet" href="assets/css/style.css?v=7" />
   </head>
   <body>
     <h1>Lake Piano</h1>
-    <label class="keyboard-mode">
-      <input type="checkbox" role="switch" id="white-keys-only" />
-      온음 모드 (흰건반 배열)
-    </label>
+    <div class="piano-controls">
+      <label class="keyboard-mode">
+        <input type="checkbox" role="switch" id="white-keys-only" />
+        온음 모드 (흰건반 배열)
+      </label>
+      <label class="size-mode">
+        건반 크기
+        <select id="piano-size">
+          <option value="real" selected>실제 크기</option>
+          <option value="simple">심플 크기</option>
+        </select>
+      </label>
+    </div>
     <div id="chromatic-guide">
       <p>각 줄은 C · C♯ · D · D♯ · E · F · F♯ · G · G♯ · A · A♯ · B 순서입니다.</p>
       <p>3옥타브: ₩/&#96; 1 2 3 4 5 6 7 8 9 0 −<br />
