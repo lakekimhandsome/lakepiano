@@ -27,6 +27,7 @@ function setup() {
     state = 'suspended';
     currentTime = 0;
     resume() { this.state = 'running'; return Promise.resolve(); }
+    suspend() { this.state = 'suspended'; return Promise.resolve(); }
     createBufferSource() {
       const source = { connect() {}, disconnect() {}, start() { this.started = true; }, stop() { this.stopped = true; } };
       sources.push(source);
@@ -165,6 +166,25 @@ test('a keyboard note resumes audio after an interruption', () => {
   app.down('KeyA');
   assert.equal(vm.runInContext('audioContext.state', app.context), 'running');
   assert.equal(app.sources.length, 2);
+  assert.equal(app.sources[1].started, true);
+});
+
+test('hiding the page suspends audio until the next note', () => {
+  const app = setup();
+  const state = () => vm.runInContext('audioContext.state', app.context);
+  app.down('KeyA');
+  assert.equal(state(), 'running');
+
+  app.document.hidden = true;
+  app.documentEvents.visibilitychange();
+  assert.equal(state(), 'suspended');
+  assert.equal(app.sources[0].stopped, true);
+
+  app.document.hidden = false;
+  app.documentEvents.visibilitychange();
+  assert.equal(state(), 'suspended');
+  app.keys.find(key => key.dataset.note === 'C5').click();
+  assert.equal(state(), 'running');
   assert.equal(app.sources[1].started, true);
 });
 

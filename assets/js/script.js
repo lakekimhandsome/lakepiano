@@ -242,5 +242,8 @@ document.addEventListener("keyup", (event) => {
 });
 window.addEventListener("blur", resetKeyboard);
 document.addEventListener("visibilitychange", () => {
-  if (document.hidden) resetKeyboard();
+  if (!document.hidden) return;
+  resetKeyboard();
+  // Release the audio device before the browser backgrounds the tab.
+  audioContext.suspend().catch(console.error);
 });
