@@ -156,6 +156,18 @@ test('shortcuts, editable fields and unrelated keys retain default behavior', ()
   assert.equal(app.sources.length, 0);
 });
 
+test('a keyboard note resumes audio after an interruption', () => {
+  const app = setup();
+  app.down('KeyA');
+  app.documentEvents.keyup({ code: 'KeyA' });
+  vm.runInContext('audioContext.state = "interrupted"', app.context);
+
+  app.down('KeyA');
+  assert.equal(vm.runInContext('audioContext.state', app.context), 'running');
+  assert.equal(app.sources.length, 2);
+  assert.equal(app.sources[1].started, true);
+});
+
 test('click playback and missing-buffer recovery', () => {
   const app = setup();
   app.keys.find(key => key.dataset.note === 'C4').click();

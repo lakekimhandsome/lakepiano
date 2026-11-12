@@ -104,7 +104,9 @@ notes.forEach((note) => {
 });
 
 function playNote(note) {
-  if (audioContext.state === "suspended") audioContext.resume().catch(console.error);
+  if (audioContext.state === "suspended" || audioContext.state === "interrupted") {
+    audioContext.resume().catch(console.error);
+  }
   const buffer = bufferMap[note.replace("#", "s")];
   if (!buffer) return;
   const source = audioContext.createBufferSource();
